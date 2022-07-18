@@ -160,10 +160,14 @@ public class ClientComms {
 
 		try {
 			// Persist if needed and send the message
-			this.clientState.send(message, token);
+			if (this.clientState != null) {
+				this.clientState.send(message, token);
+			}
 		} catch(MqttException e) {
-			token.internalTok.setClient(null); // undo client setting on error
-			if (message instanceof MqttPublish) {
+            if (token.internalTok != null) {
+                token.internalTok.setClient(null); // undo client setting on error
+            }
+			if (message instanceof MqttPublish && this.clientState != null) {
 				this.clientState.undo((MqttPublish)message);
 			}
 			throw e;
